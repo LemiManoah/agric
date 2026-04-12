@@ -1,0 +1,12 @@
+{
+    "agents": [
+        "codex",
+        "claude_code",
+        "cursor"
+    ],
+    "guidelines": true,
+    "skills": [
+        "pest-testing",
+        "tailwindcss-development"
+    ]
+}
