@@ -75,6 +75,38 @@
                     </x-layouts.sidebar-two-level-link-parent>
                 @endcan
 
+                @can('viewAny', \App\Models\Buyer::class)
+                    <x-layouts.sidebar-two-level-link-parent title="Buyers" icon="fas-cart-flatbed-suitcase" :active="request()->routeIs('admin.buyers.*') || request()->routeIs('buyer-portal.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.buyers.index') }}" icon="fas-list" :active="request()->routeIs('admin.buyers.index')">
+                            Registry
+                        </x-layouts.sidebar-two-level-link>
+
+                        @can('create', \App\Models\Buyer::class)
+                            <x-layouts.sidebar-two-level-link href="{{ route('admin.buyers.create') }}" icon="fas-plus" :active="request()->routeIs('admin.buyers.create')">
+                                New buyer
+                            </x-layouts.sidebar-two-level-link>
+                        @endcan
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endcan
+
+                @can('viewAny', \App\Models\Product::class)
+                    <x-layouts.sidebar-two-level-link-parent title="Products" icon="fas-boxes-stacked" :active="request()->routeIs('admin.products.*') || request()->routeIs('admin.product-categories.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.products.index') }}" icon="fas-list" :active="request()->routeIs('admin.products.index')">
+                            Catalogue
+                        </x-layouts.sidebar-two-level-link>
+
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.product-categories.index') }}" icon="fas-tags" :active="request()->routeIs('admin.product-categories.index')">
+                            Categories
+                        </x-layouts.sidebar-two-level-link>
+
+                        @can('create', \App\Models\Product::class)
+                            <x-layouts.sidebar-two-level-link href="{{ route('admin.products.create') }}" icon="fas-plus" :active="request()->routeIs('admin.products.create')">
+                                New product
+                            </x-layouts.sidebar-two-level-link>
+                        @endcan
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endcan
+
                 @if (auth()->user()?->can('reports.view') || auth()->user()?->can('reports.view.region'))
                     <x-layouts.sidebar-two-level-link-parent title="Reports" icon="fas-chart-column" :active="request()->routeIs('admin.reports.*')">
                         <x-layouts.sidebar-two-level-link href="{{ route('admin.reports.farmers.overview') }}" icon="fas-users" :active="request()->routeIs('admin.reports.farmers.overview')">
@@ -84,11 +116,27 @@
                         <x-layouts.sidebar-two-level-link href="{{ route('admin.reports.m1-profile-summary') }}" icon="fas-table-cells-large" :active="request()->routeIs('admin.reports.m1-profile-summary')">
                             M1 profile summary
                         </x-layouts.sidebar-two-level-link>
+
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.reports.product-catalogue-summary') }}" icon="fas-box-open" :active="request()->routeIs('admin.reports.product-catalogue-summary')">
+                            Product summary
+                        </x-layouts.sidebar-two-level-link>
                     </x-layouts.sidebar-two-level-link-parent>
                 @endif
 
-                @if (auth()->user()?->can('roles.view') || auth()->user()?->can('roles.create'))
-                    <x-layouts.sidebar-two-level-link-parent title="Access" icon="fas-user-shield" :active="request()->routeIs('admin.roles.*')">
+                @if (auth()->user()?->can('roles.view') || auth()->user()?->can('roles.create') || auth()->user()?->can('users.view') || auth()->user()?->can('users.create'))
+                    <x-layouts.sidebar-two-level-link-parent title="Access" icon="fas-user-shield" :active="request()->routeIs('admin.roles.*') || request()->routeIs('admin.users.*')">
+                        @can('users.view')
+                            <x-layouts.sidebar-two-level-link href="{{ route('admin.users.index') }}" icon="fas-users-cog" :active="request()->routeIs('admin.users.index')">
+                                Users
+                            </x-layouts.sidebar-two-level-link>
+                        @endcan
+
+                        @can('users.create')
+                            <x-layouts.sidebar-two-level-link href="{{ route('admin.users.create') }}" icon="fas-user-plus" :active="request()->routeIs('admin.users.create')">
+                                New user
+                            </x-layouts.sidebar-two-level-link>
+                        @endcan
+
                         @can('roles.view')
                             <x-layouts.sidebar-two-level-link href="{{ route('admin.roles.index') }}" icon="fas-lock" :active="request()->routeIs('admin.roles.index')">
                                 Roles
@@ -96,7 +144,7 @@
                         @endcan
 
                         @can('roles.create')
-                            <x-layouts.sidebar-two-level-link href="{{ route('admin.roles.create') }}" icon="fas-user-plus" :active="request()->routeIs('admin.roles.create')">
+                            <x-layouts.sidebar-two-level-link href="{{ route('admin.roles.create') }}" icon="fas-shield-halved" :active="request()->routeIs('admin.roles.create')">
                                 New role
                             </x-layouts.sidebar-two-level-link>
                         @endcan

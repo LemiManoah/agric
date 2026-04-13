@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             UgandaLocationSeeder::class,
             DemoUserSeeder::class,
             M1DemoDataSeeder::class,
+            BuyerDemoSeeder::class,
+            ProductCatalogueDemoSeeder::class,
         ]);
     }
 }
