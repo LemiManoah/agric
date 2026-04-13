@@ -32,13 +32,28 @@
   - public/auth-ready farmer registration wizard with dependent geography selects and mapping inputs
   - route additions for the map page and registration wizard
   - Pest coverage for the map page, registration wizard, and farmer registration service
+- Extended the farmer management workflow:
+  - farmer detail page with location summary, activity timeline, and verification panel
+  - farmer edit flow with normalized geography, coordinates, passport photo support, business profile, and value chain production data
+  - field officer registration surface for internal farmer onboarding
+  - first farmer overview reporting page with CSV export support
+- Added the next M1 ecosystem profiling batch:
+  - supplier schema, pivots, model, policy, service, index/form/show pages, verification actions, and CSV export
+  - agent schema, pivots, model, policy, service, index/form pages, auto-generated `AGT-XXXXX` codes, and CSV export
+  - agribusiness schema, district coverage pivot, model, policy, service, index/form pages, and CSV export
+  - reusable `CsvExportService` for the first M1 admin lists and reports
+  - M1 profile summary report covering suppliers, agents, and agribusiness entity totals
+  - route wiring for suppliers, agents, agribusiness profiles, and the M1 profile summary report
+  - focused Pest coverage for supplier, agent, agribusiness, report, and export flows
+- Updated the application sidebar navigation so the completed M1 farmer, supplier, agent, agribusiness, and report pages are reachable from the starter-kit layout.
 - Updated the auth layout so guest-facing Livewire pages can render without rebuilding the starter-kit scaffolding.
 
 ## Next
 
-- Request the next checklist batch to continue the implementation.
+- Continue with the next approved checklist batch without refactoring completed M1 work.
 
 ## Notes
 
 - `project.md` asked for normalized geography. I used `village_id` on `farmer_locations` instead of a free-text village field so dependent selects and reporting can stay consistent.
 - The starter kit layout now includes Livewire assets, and Alpine is no longer booted separately in `resources/js/bootstrap.js` to avoid double-loading it.
+- Internal navigation now reflects the implemented M1 modules instead of the starter-kit example sidebar links.

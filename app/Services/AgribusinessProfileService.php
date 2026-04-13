@@ -18,10 +18,7 @@ class AgribusinessProfileService
             throw_unless($actor->can('create', AgribusinessProfile::class), AuthorizationException::class);
         }
 
-        $normalized = $this->normalizePayload([
-            'user_id' => $data['user_id'] ?? $profile->user_id,
-            ...$data,
-        ]);
+        $normalized = $this->normalizePayload($data);
 
         if ($actor) {
             $this->ensureScope($normalized, $actor);
@@ -48,7 +45,10 @@ class AgribusinessProfileService
             throw_unless($actor->can('update', $profile), AuthorizationException::class);
         }
 
-        $normalized = $this->normalizePayload($data);
+        $normalized = $this->normalizePayload([
+            'user_id' => $data['user_id'] ?? $profile->user_id,
+            ...$data,
+        ]);
 
         if ($actor) {
             $this->ensureScope($normalized, $actor);
@@ -70,11 +70,13 @@ class AgribusinessProfileService
      */
     private function normalizePayload(array $data): array
     {
+        $entityType = $data['entity_type'] ?? AgribusinessEntityType::Cooperative->value;
+
         return [
             'user_id' => $this->nullableInt($data['user_id'] ?? null),
-            'entity_type' => $data['entity_type'] instanceof AgribusinessEntityType
-                ? $data['entity_type']
-                : AgribusinessEntityType::from($data['entity_type']),
+            'entity_type' => $entityType instanceof AgribusinessEntityType
+                ? $entityType
+                : AgribusinessEntityType::from($entityType),
             'organization_name' => $this->nullableString($data['organization_name'] ?? null) ?? '',
             'registration_number' => $this->nullableString($data['registration_number'] ?? null),
             'membership_size' => $this->nullableInt($data['membership_size'] ?? null),

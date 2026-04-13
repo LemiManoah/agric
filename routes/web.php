@@ -11,6 +11,8 @@ use App\Livewire\Admin\Farmers\Map as FarmerMap;
 use App\Livewire\Admin\Farmers\Show as FarmerShow;
 use App\Livewire\Admin\Reports\FarmerOverview;
 use App\Livewire\Admin\Reports\M1ProfileSummary;
+use App\Livewire\Admin\Roles\Form as RoleForm;
+use App\Livewire\Admin\Roles\Index as RoleIndex;
 use App\Livewire\Admin\Suppliers\Form as SupplierForm;
 use App\Livewire\Admin\Suppliers\Index as SupplierIndex;
 use App\Livewire\Admin\Suppliers\Show as SupplierShow;
@@ -54,6 +56,18 @@ Route::middleware(['auth', 'verified', 'permission:farmers.create'])->group(func
 Route::middleware(['auth', 'verified', 'permission:reports.view|reports.view.region'])->group(function () {
     Route::get('admin/reports/farmers/overview', FarmerOverview::class)->name('admin.reports.farmers.overview');
     Route::get('admin/reports/m1-profile-summary', M1ProfileSummary::class)->name('admin.reports.m1-profile-summary');
+});
+
+Route::middleware(['auth', 'verified', 'permission:roles.view'])->group(function () {
+    Route::get('admin/roles', RoleIndex::class)->name('admin.roles.index');
+});
+
+Route::middleware(['auth', 'verified', 'permission:roles.create'])->group(function () {
+    Route::get('admin/roles/create', RoleForm::class)->name('admin.roles.create');
+});
+
+Route::middleware(['auth', 'verified', 'permission:roles.update'])->group(function () {
+    Route::get('admin/roles/{role}/edit', RoleForm::class)->name('admin.roles.edit');
 });
 
 Route::get('farmer-portal/register', FarmerRegistrationWizard::class)->name('farmer-portal.registration.create');

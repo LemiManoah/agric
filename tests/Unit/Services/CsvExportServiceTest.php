@@ -14,6 +14,6 @@ it('streams CSV content for keyed rows', function () {
 
     expect($response->headers->get('content-type'))->toContain('text/csv')
         ->and($content)->toContain('name,status')
-        ->and($content)->toContain('Supplier One,verified')
-        ->and($content)->toContain('Supplier Two,submitted');
+        ->and($content)->toContain('"Supplier One",verified')
+        ->and($content)->toContain('"Supplier Two",submitted');
 });

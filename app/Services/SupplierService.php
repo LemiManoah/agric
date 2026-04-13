@@ -19,12 +19,7 @@ class SupplierService
             throw_unless($actor->can('create', Supplier::class), AuthorizationException::class);
         }
 
-        $normalized = $this->normalizePayload([
-            'user_id' => $data['user_id'] ?? $supplier->user_id,
-            'verification_status' => $data['verification_status'] ?? $supplier->verification_status,
-            'warehouse_linked' => $data['warehouse_linked'] ?? $supplier->warehouse_linked,
-            ...$data,
-        ]);
+        $normalized = $this->normalizePayload($data);
 
         if ($actor) {
             $this->ensureScope($normalized, $actor);
@@ -52,7 +47,12 @@ class SupplierService
             throw_unless($actor->can('update', $supplier), AuthorizationException::class);
         }
 
-        $normalized = $this->normalizePayload($data);
+        $normalized = $this->normalizePayload([
+            'user_id' => $data['user_id'] ?? $supplier->user_id,
+            'verification_status' => $data['verification_status'] ?? $supplier->verification_status,
+            'warehouse_linked' => $data['warehouse_linked'] ?? $supplier->warehouse_linked,
+            ...$data,
+        ]);
 
         if ($actor) {
             $this->ensureScope($normalized, $actor);
@@ -132,6 +132,9 @@ class SupplierService
      */
     private function normalizePayload(array $data): array
     {
+        $supplyFrequency = $data['supply_frequency'] ?? null;
+        $verificationStatus = $data['verification_status'] ?? VerificationStatus::Submitted->value;
+
         return [
             'user_id' => $this->nullableInt($data['user_id'] ?? null),
             'farmer_id' => $this->nullableInt($data['farmer_id'] ?? null),
@@ -141,14 +144,12 @@ class SupplierService
             'email' => $this->nullableString($data['email'] ?? null),
             'operating_district_id' => $this->nullableInt($data['operating_district_id'] ?? null),
             'typical_supply_volume_kg_per_month' => $this->nullableFloat($data['typical_supply_volume_kg_per_month'] ?? null),
-            'supply_frequency' => $data['supply_frequency'] instanceof \BackedEnum
-                ? $data['supply_frequency']->value
-                : $this->nullableString($data['supply_frequency'] ?? null),
-            'verification_status' => VerificationStatus::from(
-                $data['verification_status'] instanceof VerificationStatus
-                    ? $data['verification_status']->value
-                    : ($data['verification_status'] ?? VerificationStatus::Submitted->value)
-            ),
+            'supply_frequency' => $supplyFrequency instanceof \BackedEnum
+                ? $supplyFrequency->value
+                : $this->nullableString($supplyFrequency),
+            'verification_status' => $verificationStatus instanceof VerificationStatus
+                ? $verificationStatus
+                : VerificationStatus::from($verificationStatus),
             'warehouse_linked' => (bool) ($data['warehouse_linked'] ?? false),
             'quality_grade_ids' => collect($data['quality_grade_ids'] ?? [])
                 ->map(fn (mixed $id): int => (int) $id)
