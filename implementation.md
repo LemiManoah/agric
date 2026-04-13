@@ -47,10 +47,28 @@
   - focused Pest coverage for supplier, agent, agribusiness, report, and export flows
 - Updated the application sidebar navigation so the completed M1 farmer, supplier, agent, agribusiness, and report pages are reachable from the starter-kit layout.
 - Updated the auth layout so guest-facing Livewire pages can render without rebuilding the starter-kit scaffolding.
+- Added the M2 foundation batch:
+  - buyer registration, admin management, verification actions, and buyer portal profile
+  - product categories, supplier-linked products, product images, price history, and admin catalogue management
+  - public catalogue browsing and product detail pages
+  - richer M2 factories and demo seeders for buyers and catalogue data
+- Added the M2 cart and order foundation:
+  - carts and cart items
+  - orders, order items, and order status history
+  - `OrderPolicy`, `CartService`, `OrderService`, `StockService`, and `OrderNumberGenerator`
+  - buyer cart, checkout, order history, and order detail pages
+  - agent-assisted checkout and agent order history
+  - admin order list, detail page, status actions, and CSV export support
+  - cart/order factories plus `OrderDemoSeeder` for practical local UI review
+  - focused Pest coverage for cart, checkout, buyer/agent order flows, admin order management, services, and demo seeding
+- Fixed UI regressions introduced during the M2 expansion:
+  - restored working `admin/buyers/create` and `admin/products/create` route matching by resolving route-order collisions
+  - replaced child sidebar icons with simple bullet markers
+  - corrected label/input alignment on the user, buyer, and product create/edit forms that use the shared `x-forms.input` component inside grid layouts
 
 ## Next
 
-- Continue with the next approved checklist batch without refactoring completed M1 work.
+- Continue with the next approved checklist batch without refactoring completed M1 or current M2 work.
 
 ## Notes
 
