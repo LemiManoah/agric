@@ -2,7 +2,6 @@
 
 use App\Enums\VerificationStatus;
 use App\Livewire\Admin\Buyers\Form;
-use App\Livewire\Admin\Buyers\Index;
 use App\Livewire\Admin\Buyers\VerificationAction;
 use App\Models\Buyer;
 use App\Models\User;
@@ -22,6 +21,16 @@ it('renders the buyer index for a super admin', function () {
         ->get(route('admin.buyers.index'))
         ->assertSuccessful()
         ->assertSee('Buyer registry');
+});
+
+it('renders the buyer create page without route collisions', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $this->actingAs($admin)
+        ->get(route('admin.buyers.create'))
+        ->assertSuccessful()
+        ->assertSee('Create buyer');
 });
 
 it('creates a buyer through the livewire form', function () {

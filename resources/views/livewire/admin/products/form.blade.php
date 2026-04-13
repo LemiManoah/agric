@@ -15,7 +15,9 @@
     <form wire:submit="save" class="space-y-6">
         <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                <x-forms.input label="Product name" name="name" wire:model.live="name" />
+                <div class="space-y-1">
+                    <x-forms.input label="Product name" name="name" wire:model.live="name" />
+                </div>
 
                 <div class="space-y-1">
                     <label for="product_category_id" class="block ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
@@ -47,11 +49,21 @@
                     </select>
                 </div>
 
-                <x-forms.input label="Unit of measure" name="unit_of_measure" wire:model.live="unit_of_measure" />
-                <x-forms.input label="Warehouse SKU" name="warehouse_sku" wire:model.live="warehouse_sku" />
-                <x-forms.input label="Price per unit (USD)" name="price_per_unit_usd" type="number" step="0.01" min="0" wire:model.live="price_per_unit_usd" />
-                <x-forms.input label="Minimum order quantity" name="minimum_order_quantity" type="number" step="0.01" min="0.01" wire:model.live="minimum_order_quantity" />
-                <x-forms.input label="Stock available" name="stock_available" type="number" step="0.01" min="0" wire:model.live="stock_available" />
+                <div class="space-y-1">
+                    <x-forms.input label="Unit of measure" name="unit_of_measure" wire:model.live="unit_of_measure" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Warehouse SKU" name="warehouse_sku" wire:model.live="warehouse_sku" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Price per unit (USD)" name="price_per_unit_usd" type="number" step="0.01" min="0" wire:model.live="price_per_unit_usd" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Minimum order quantity" name="minimum_order_quantity" type="number" step="0.01" min="0.01" wire:model.live="minimum_order_quantity" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Stock available" name="stock_available" type="number" step="0.01" min="0" wire:model.live="stock_available" />
+                </div>
 
                 <div class="space-y-1">
                     <label for="listing_status" class="block ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">Listing status</label>

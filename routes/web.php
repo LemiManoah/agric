@@ -12,6 +12,8 @@ use App\Livewire\Admin\Farmers\Edit as FarmerEdit;
 use App\Livewire\Admin\Farmers\Index as FarmerIndex;
 use App\Livewire\Admin\Farmers\Map as FarmerMap;
 use App\Livewire\Admin\Farmers\Show as FarmerShow;
+use App\Livewire\Admin\Orders\Index as OrderIndex;
+use App\Livewire\Admin\Orders\Show as OrderShow;
 use App\Livewire\Admin\ProductCategories\Index as ProductCategoryIndex;
 use App\Livewire\Admin\Products\Form as ProductForm;
 use App\Livewire\Admin\Products\Index as ProductIndex;
@@ -26,6 +28,12 @@ use App\Livewire\Admin\Suppliers\Index as SupplierIndex;
 use App\Livewire\Admin\Suppliers\Show as SupplierShow;
 use App\Livewire\Admin\Users\Form as UserForm;
 use App\Livewire\Admin\Users\Index as UserIndex;
+use App\Livewire\AgentPortal\CheckoutForBuyer as AgentCheckoutForBuyer;
+use App\Livewire\AgentPortal\Orders\Index as AgentOrderIndex;
+use App\Livewire\BuyerPortal\CartPage as BuyerCartPage;
+use App\Livewire\BuyerPortal\CheckoutPage as BuyerCheckoutPage;
+use App\Livewire\BuyerPortal\Orders\Index as BuyerOrderIndex;
+use App\Livewire\BuyerPortal\Orders\Show as BuyerOrderShow;
 use App\Livewire\BuyerPortal\Profile as BuyerPortalProfile;
 use App\Livewire\BuyerPortal\Registration\Create as BuyerRegistrationCreate;
 use App\Livewire\FarmerPortal\Registration\Wizard as FarmerRegistrationWizard;
@@ -104,7 +112,6 @@ Route::get('catalogue/{product}', PublicCatalogueShow::class)->name('catalogue.s
 
 Route::middleware(['auth', 'verified', 'can:viewAny,App\Models\Buyer', 'permission:buyers.view'])->group(function () {
     Route::get('admin/buyers', BuyerIndex::class)->name('admin.buyers.index');
-    Route::get('admin/buyers/{buyer}', BuyerShow::class)->name('admin.buyers.show');
 });
 
 Route::middleware(['auth', 'verified', 'permission:buyers.create'])->group(function () {
@@ -113,6 +120,10 @@ Route::middleware(['auth', 'verified', 'permission:buyers.create'])->group(funct
 
 Route::middleware(['auth', 'verified', 'permission:buyers.update'])->group(function () {
     Route::get('admin/buyers/{buyer}/edit', BuyerForm::class)->name('admin.buyers.edit');
+});
+
+Route::middleware(['auth', 'verified', 'can:viewAny,App\Models\Buyer', 'permission:buyers.view'])->group(function () {
+    Route::get('admin/buyers/{buyer}', BuyerShow::class)->name('admin.buyers.show');
 });
 
 Route::middleware(['auth', 'verified', 'permission:suppliers.create'])->group(function () {
@@ -155,7 +166,6 @@ Route::middleware(['auth', 'verified', 'permission:agribusiness_profiles.update'
 Route::middleware(['auth', 'verified', 'permission:products.view', 'can:viewAny,App\Models\Product'])->group(function () {
     Route::get('admin/product-categories', ProductCategoryIndex::class)->name('admin.product-categories.index');
     Route::get('admin/products', ProductIndex::class)->name('admin.products.index');
-    Route::get('admin/products/{product}', ProductShow::class)->name('admin.products.show');
 });
 
 Route::middleware(['auth', 'verified', 'permission:products.create', 'can:create,App\Models\Product'])->group(function () {
@@ -166,8 +176,29 @@ Route::middleware(['auth', 'verified', 'permission:products.update'])->group(fun
     Route::get('admin/products/{product}/edit', ProductForm::class)->name('admin.products.edit');
 });
 
+Route::middleware(['auth', 'verified', 'permission:products.view', 'can:viewAny,App\Models\Product'])->group(function () {
+    Route::get('admin/products/{product}', ProductShow::class)->name('admin.products.show');
+});
+
+Route::middleware(['auth', 'verified', 'permission:orders.view.all|orders.view.region', 'can:viewAny,App\Models\Order'])->group(function () {
+    Route::get('admin/orders', OrderIndex::class)->name('admin.orders.index');
+    Route::get('admin/orders/{order}', OrderShow::class)->name('admin.orders.show');
+});
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('buyer-portal/profile', BuyerPortalProfile::class)->name('buyer-portal.profile');
+});
+
+Route::middleware(['auth', 'verified', 'permission:orders.create|orders.view.own'])->group(function () {
+    Route::get('buyer-portal/cart', BuyerCartPage::class)->name('buyer-portal.cart');
+    Route::get('buyer-portal/checkout', BuyerCheckoutPage::class)->name('buyer-portal.checkout');
+    Route::get('buyer-portal/orders', BuyerOrderIndex::class)->name('buyer-portal.orders.index');
+    Route::get('buyer-portal/orders/{order}', BuyerOrderShow::class)->name('buyer-portal.orders.show');
+});
+
+Route::middleware(['auth', 'verified', 'permission:orders.create|orders.view.own'])->group(function () {
+    Route::get('agent-portal/checkout', AgentCheckoutForBuyer::class)->name('agent-portal.checkout-for-buyer');
+    Route::get('agent-portal/orders', AgentOrderIndex::class)->name('agent-portal.orders.index');
 });
 
 require __DIR__.'/auth.php';

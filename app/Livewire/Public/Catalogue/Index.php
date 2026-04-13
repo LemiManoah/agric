@@ -6,6 +6,7 @@ use App\Enums\ListingStatus;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\QualityGrade;
+use App\Services\CartService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Title;
@@ -17,6 +18,8 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use WithPagination;
+
+    protected CartService $cartService;
 
     #[Url(as: 'search', except: '')]
     public string $search = '';
@@ -30,11 +33,36 @@ class Index extends Component
     #[Url(as: 'availability', except: '')]
     public string $availability = 'in_stock';
 
+    /** @var array<int, string> */
+    public array $quantities = [];
+
+    public function boot(CartService $cartService): void
+    {
+        $this->cartService = $cartService;
+    }
+
     public function updating(string $name, mixed $value): void
     {
         if (in_array($name, ['search', 'categoryId', 'qualityGradeId', 'availability'], true)) {
             $this->resetPage();
         }
+    }
+
+    public function addToCart(int $productId)
+    {
+        $product = Product::query()->publiclyVisible()->findOrFail($productId);
+
+        if (! auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        abort_unless(auth()->user()?->hasRole('buyer') || auth()->user()?->hasRole('agent'), 403);
+
+        $quantity = $this->quantities[$productId] ?? $product->minimum_order_quantity;
+
+        $this->cartService->addItem(auth()->user(), $product, $quantity);
+
+        session()->flash('status', 'Product added to cart.');
     }
 
     public function render(): View

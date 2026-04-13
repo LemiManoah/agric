@@ -15,10 +15,21 @@
     <form wire:submit="save" class="space-y-6">
         <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                <x-forms.input label="Full name" name="name" wire:model.live="name" />
-                <x-forms.input label="Email" name="email" type="email" wire:model.live="email" />
-                <x-forms.input label="Phone" name="phone" wire:model.live="phone" />
-                <x-forms.input label="{{ $user ? 'New password (optional)' : 'Password' }}" name="password" type="password" wire:model.live="password" />
+                <div class="space-y-1">
+                    <x-forms.input label="Full name" name="name" wire:model.live="name" />
+                </div>
+
+                <div class="space-y-1">
+                    <x-forms.input label="Email" name="email" type="email" wire:model.live="email" />
+                </div>
+
+                <div class="space-y-1">
+                    <x-forms.input label="Phone" name="phone" wire:model.live="phone" />
+                </div>
+
+                <div class="space-y-1">
+                    <x-forms.input label="{{ $user ? 'New password (optional)' : 'Password' }}" name="password" type="password" wire:model.live="password" />
+                </div>
 
                 <div class="space-y-1">
                     <label for="status" class="block ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>

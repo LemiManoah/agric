@@ -71,13 +71,15 @@ class Index extends Component
 
     public function render(): View
     {
+        $buyerQuery = $this->buyerQuery();
+
         return view('livewire.admin.buyers.index', [
-            'businessTypes' => $this->buyerQuery()->clone()->select('business_type')->distinct()->orderBy('business_type')->pluck('business_type'),
-            'buyers' => $this->buyerQuery()
+            'businessTypes' => (clone $buyerQuery)->select('business_type')->distinct()->orderBy('business_type')->pluck('business_type'),
+            'buyers' => $buyerQuery
                 ->with('valueChainInterests')
                 ->orderBy('company_name')
                 ->paginate(12),
-            'countries' => $this->buyerQuery()->clone()->select('country')->distinct()->orderBy('country')->pluck('country'),
+            'countries' => (clone $buyerQuery)->select('country')->distinct()->orderBy('country')->pluck('country'),
         ])->layout('components.layouts.app');
     }
 

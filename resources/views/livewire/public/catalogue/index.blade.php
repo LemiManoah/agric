@@ -11,7 +11,7 @@
             <div class="rounded-[1.5rem] border border-white/10 bg-black/10 p-5 backdrop-blur">
                 <div class="text-xs uppercase tracking-[0.2em] text-emerald-100/70">Marketplace note</div>
                 <p class="mt-3 text-sm leading-7 text-emerald-50/85">
-                    Cart, checkout, and payments are intentionally not enabled yet. This catalogue is the browseable foundation for those next phases.
+                    Buyers and agents can now build carts and submit orders. Payments remain a clean placeholder for the next phase.
                 </p>
             </div>
         </div>
@@ -78,9 +78,21 @@
                             <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Price</div>
                             <div class="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">${{ number_format((float) $product->price_per_unit_usd, 2) }} / {{ $product->unit_of_measure }}</div>
                         </div>
-                        <a href="{{ route('catalogue.show', $product) }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700">
-                            View details
-                        </a>
+                        <div class="flex flex-wrap items-center justify-end gap-3">
+                            @auth
+                                @if (auth()->user()->hasRole('buyer') || auth()->user()->hasRole('agent'))
+                                    <div class="flex items-center gap-2">
+                                        <input wire:model.defer="quantities.{{ $product->id }}" type="number" step="0.01" min="{{ (float) $product->minimum_order_quantity }}" placeholder="{{ (float) $product->minimum_order_quantity }}" class="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
+                                        <button type="button" wire:click="addToCart({{ $product->id }})" class="inline-flex items-center rounded-lg border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/30">
+                                            Add to cart
+                                        </button>
+                                    </div>
+                                @endif
+                            @endauth
+                            <a href="{{ route('catalogue.show', $product) }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700">
+                                View details
+                            </a>
+                        </div>
                     </div>
                 </div>
             </article>

@@ -107,6 +107,39 @@
                     </x-layouts.sidebar-two-level-link-parent>
                 @endcan
 
+                @can('viewAny', \App\Models\Order::class)
+                    <x-layouts.sidebar-two-level-link-parent title="Orders" icon="fas-cart-shopping" :active="request()->routeIs('admin.orders.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.orders.index') }}" icon="fas-list" :active="request()->routeIs('admin.orders.index')">
+                            Order list
+                        </x-layouts.sidebar-two-level-link>
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endcan
+
+                @if (auth()->user()?->hasRole('buyer'))
+                    <x-layouts.sidebar-two-level-link-parent title="Buyer Portal" icon="fas-store" :active="request()->routeIs('buyer-portal.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('buyer-portal.profile') }}" icon="fas-user" :active="request()->routeIs('buyer-portal.profile')">
+                            Profile
+                        </x-layouts.sidebar-two-level-link>
+                        <x-layouts.sidebar-two-level-link href="{{ route('buyer-portal.cart') }}" icon="fas-cart-shopping" :active="request()->routeIs('buyer-portal.cart')">
+                            Cart
+                        </x-layouts.sidebar-two-level-link>
+                        <x-layouts.sidebar-two-level-link href="{{ route('buyer-portal.orders.index') }}" icon="fas-receipt" :active="request()->routeIs('buyer-portal.orders.*')">
+                            My orders
+                        </x-layouts.sidebar-two-level-link>
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endif
+
+                @if (auth()->user()?->hasRole('agent'))
+                    <x-layouts.sidebar-two-level-link-parent title="Agent Portal" icon="fas-briefcase" :active="request()->routeIs('agent-portal.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('agent-portal.checkout-for-buyer') }}" icon="fas-handshake" :active="request()->routeIs('agent-portal.checkout-for-buyer')">
+                            Buyer checkout
+                        </x-layouts.sidebar-two-level-link>
+                        <x-layouts.sidebar-two-level-link href="{{ route('agent-portal.orders.index') }}" icon="fas-list-check" :active="request()->routeIs('agent-portal.orders.*')">
+                            My orders
+                        </x-layouts.sidebar-two-level-link>
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endif
+
                 @if (auth()->user()?->can('reports.view') || auth()->user()?->can('reports.view.region'))
                     <x-layouts.sidebar-two-level-link-parent title="Reports" icon="fas-chart-column" :active="request()->routeIs('admin.reports.*')">
                         <x-layouts.sidebar-two-level-link href="{{ route('admin.reports.farmers.overview') }}" icon="fas-users" :active="request()->routeIs('admin.reports.farmers.overview')">

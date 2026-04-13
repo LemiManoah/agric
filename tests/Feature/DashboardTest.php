@@ -26,6 +26,8 @@ test('authorized users can see the M1 sidebar navigation', function () {
         ->assertSee('Suppliers')
         ->assertSee('Agents')
         ->assertSee('Agribusiness')
+        ->assertSee('Products')
+        ->assertSee('Orders')
         ->assertSee('Reports')
         ->assertSee('Access')
         ->assertSee('Roles')
@@ -33,6 +35,8 @@ test('authorized users can see the M1 sidebar navigation', function () {
         ->assertSee(route('admin.suppliers.index'), false)
         ->assertSee(route('admin.agents.index'), false)
         ->assertSee(route('admin.agribusiness-profiles.index'), false)
+        ->assertSee(route('admin.products.index'), false)
+        ->assertSee(route('admin.orders.index'), false)
         ->assertSee(route('admin.reports.m1-profile-summary'), false)
         ->assertSee(route('admin.roles.index'), false);
 });

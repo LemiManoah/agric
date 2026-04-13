@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -64,6 +65,11 @@ class Buyer extends Model
     public function valueChainInterests(): BelongsToMany
     {
         return $this->belongsToMany(ValueChain::class, 'buyer_value_chain_interests')->withTimestamps();
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function activities(): MorphMany

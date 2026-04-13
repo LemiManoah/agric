@@ -28,6 +28,16 @@ it('renders the admin product index for a super admin', function () {
         ->assertSee('Product listings');
 });
 
+it('renders the product create page without route collisions', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $this->actingAs($admin)
+        ->get(route('admin.products.create'))
+        ->assertSuccessful()
+        ->assertSee('Create product');
+});
+
 it('creates a product category from the management page', function () {
     $admin = User::factory()->create();
     $admin->assignRole('super_admin');

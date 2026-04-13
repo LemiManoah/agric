@@ -40,10 +40,31 @@
             </div>
 
             <div class="rounded-2xl border border-dashed border-emerald-300 bg-emerald-50 p-5 dark:border-emerald-800 dark:bg-emerald-900/20">
-                <div class="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Future action</div>
-                <p class="mt-2 text-sm leading-7 text-emerald-700 dark:text-emerald-300">
-                    Cart and enquiry actions are not live yet. Buyers will be able to act on this listing in a later implementation batch.
-                </p>
+                <div class="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Order action</div>
+                @auth
+                    @if (auth()->user()->hasRole('buyer') || auth()->user()->hasRole('agent'))
+                        <div class="mt-3 flex flex-col gap-3">
+                            <input wire:model.live="quantity" type="number" step="0.01" min="{{ (float) $product->minimum_order_quantity }}" class="w-full rounded-xl border border-emerald-300 bg-white px-4 py-3 text-sm text-gray-900 dark:border-emerald-800 dark:bg-gray-950 dark:text-gray-100">
+                            <button type="button" wire:click="addToCart" class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700">
+                                Add to cart
+                            </button>
+                            @if (auth()->user()->hasRole('buyer'))
+                                <a href="{{ route('buyer-portal.cart') }}" class="text-sm font-medium text-emerald-700 dark:text-emerald-300">Go to buyer cart</a>
+                            @endif
+                            @if (auth()->user()->hasRole('agent'))
+                                <a href="{{ route('agent-portal.checkout-for-buyer') }}" class="text-sm font-medium text-emerald-700 dark:text-emerald-300">Go to agent checkout</a>
+                            @endif
+                        </div>
+                    @else
+                        <p class="mt-2 text-sm leading-7 text-emerald-700 dark:text-emerald-300">
+                            Sign in with a buyer or agent account to add this listing to a cart.
+                        </p>
+                    @endif
+                @else
+                    <p class="mt-2 text-sm leading-7 text-emerald-700 dark:text-emerald-300">
+                        Sign in with a buyer or agent account to add this listing to a cart.
+                    </p>
+                @endauth
             </div>
         </section>
     </div>
