@@ -1,5 +1,18 @@
 <?php
 
+use App\Enums\RegistrationSource;
+use App\Enums\VerificationStatus;
+use App\Models\District;
+use App\Models\Farmer;
+use App\Models\FarmerLocation;
+use App\Models\Parish;
+use App\Models\Region;
+use App\Models\Subcounty;
+use App\Models\User;
+use App\Models\Village;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,9 +24,9 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +57,67 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function createTestLocationHierarchy(): array
+{
+    $region = Region::query()->create([
+        'name' => 'Region '.fake()->unique()->word(),
+        'code' => 'UG-R-'.fake()->unique()->numerify('###'),
+    ]);
+
+    $district = District::query()->create([
+        'region_id' => $region->id,
+        'name' => 'District '.fake()->unique()->word(),
+        'code' => 'UG-D-'.fake()->unique()->numerify('###'),
+    ]);
+
+    $subcounty = Subcounty::query()->create([
+        'district_id' => $district->id,
+        'name' => 'Subcounty '.fake()->unique()->word(),
+        'code' => 'UG-S-'.fake()->unique()->numerify('###'),
+    ]);
+
+    $parish = Parish::query()->create([
+        'subcounty_id' => $subcounty->id,
+        'name' => 'Parish '.fake()->unique()->word(),
+    ]);
+
+    $village = Village::query()->create([
+        'parish_id' => $parish->id,
+        'name' => 'Village '.fake()->unique()->word(),
+    ]);
+
+    return compact('region', 'district', 'subcounty', 'parish', 'village');
+}
+
+function createScopedUser(string $role, array $attributes = []): User
+{
+    $user = User::factory()->create($attributes);
+    $user->assignRole($role);
+
+    return $user;
+}
+
+function createFarmerRecord(array $farmerAttributes = [], array $locationAttributes = []): Farmer
+{
+    $location = createTestLocationHierarchy();
+
+    $farmer = Farmer::query()->create(array_merge([
+        'full_name' => 'Farmer '.fake()->unique()->name(),
+        'phone' => fake()->unique()->numerify('25670000####'),
+        'registration_source' => RegistrationSource::FieldOfficer,
+        'verification_status' => VerificationStatus::Submitted,
+    ], $farmerAttributes));
+
+    FarmerLocation::query()->create(array_merge([
+        'farmer_id' => $farmer->id,
+        'region_id' => $location['region']->id,
+        'district_id' => $location['district']->id,
+        'subcounty_id' => $location['subcounty']->id,
+        'parish_id' => $location['parish']->id,
+        'village_id' => $location['village']->id,
+    ], $locationAttributes));
+
+    return $farmer->fresh(['location.region', 'location.district', 'location.subcounty', 'location.parish', 'location.village']);
 }

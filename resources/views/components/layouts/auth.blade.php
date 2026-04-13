@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - {{ config('app.name') }}</title>
+    <title>{{ $title ?? config('app.name') }}</title>
     @vite('resources/css/app.css')
+    @livewireStyles
     <script>
         function applyTheme() {
             const userPref = localStorage.getItem('darkMode');
@@ -39,11 +40,12 @@
     <div class="min-h-screen flex flex-col">
         <!-- Main Content -->
         <main class="flex-1 flex items-center justify-center p-6">
-            <div class="w-full max-w-md">
+            <div class="w-full max-w-5xl">
                 {{ $slot }}
             </div>
         </main>
     </div>
+    @livewireScripts
 </body>
 
 </html>

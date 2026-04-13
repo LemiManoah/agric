@@ -6,6 +6,7 @@
     ],
     "guidelines": true,
     "skills": [
+        "livewire-development",
         "pest-testing",
         "tailwindcss-development"
     ]
