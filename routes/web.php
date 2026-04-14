@@ -12,14 +12,18 @@ use App\Livewire\Admin\Farmers\Edit as FarmerEdit;
 use App\Livewire\Admin\Farmers\Index as FarmerIndex;
 use App\Livewire\Admin\Farmers\Map as FarmerMap;
 use App\Livewire\Admin\Farmers\Show as FarmerShow;
+use App\Livewire\Admin\Notifications\Index as NotificationIndex;
 use App\Livewire\Admin\Orders\Index as OrderIndex;
 use App\Livewire\Admin\Orders\Show as OrderShow;
+use App\Livewire\Admin\Payments\Index as PaymentIndex;
+use App\Livewire\Admin\Payments\Show as PaymentShow;
 use App\Livewire\Admin\ProductCategories\Index as ProductCategoryIndex;
 use App\Livewire\Admin\Products\Form as ProductForm;
 use App\Livewire\Admin\Products\Index as ProductIndex;
 use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Admin\Reports\FarmerOverview;
 use App\Livewire\Admin\Reports\M1ProfileSummary;
+use App\Livewire\Admin\Reports\PaymentSummary;
 use App\Livewire\Admin\Reports\ProductCatalogueSummary;
 use App\Livewire\Admin\Roles\Form as RoleForm;
 use App\Livewire\Admin\Roles\Index as RoleIndex;
@@ -34,7 +38,9 @@ use App\Livewire\BuyerPortal\CartPage as BuyerCartPage;
 use App\Livewire\BuyerPortal\CheckoutPage as BuyerCheckoutPage;
 use App\Livewire\BuyerPortal\Orders\Index as BuyerOrderIndex;
 use App\Livewire\BuyerPortal\Orders\Show as BuyerOrderShow;
+use App\Livewire\BuyerPortal\Payments\Index as BuyerPaymentIndex;
 use App\Livewire\BuyerPortal\Profile as BuyerPortalProfile;
+use App\Livewire\BuyerPortal\Receipts\Show as BuyerReceiptShow;
 use App\Livewire\BuyerPortal\Registration\Create as BuyerRegistrationCreate;
 use App\Livewire\FarmerPortal\Registration\Wizard as FarmerRegistrationWizard;
 use App\Livewire\FieldOfficer\Farmers\Create as FieldOfficerFarmerCreate;
@@ -78,6 +84,7 @@ Route::middleware(['auth', 'verified', 'permission:farmers.create'])->group(func
 Route::middleware(['auth', 'verified', 'permission:reports.view|reports.view.region'])->group(function () {
     Route::get('admin/reports/farmers/overview', FarmerOverview::class)->name('admin.reports.farmers.overview');
     Route::get('admin/reports/m1-profile-summary', M1ProfileSummary::class)->name('admin.reports.m1-profile-summary');
+    Route::get('admin/reports/payment-summary', PaymentSummary::class)->name('admin.reports.payment-summary');
     Route::get('admin/reports/product-catalogue-summary', ProductCatalogueSummary::class)->name('admin.reports.product-catalogue-summary');
 });
 
@@ -185,6 +192,15 @@ Route::middleware(['auth', 'verified', 'permission:orders.view.all|orders.view.r
     Route::get('admin/orders/{order}', OrderShow::class)->name('admin.orders.show');
 });
 
+Route::middleware(['auth', 'verified', 'permission:payments.view', 'can:viewAny,App\Models\Payment'])->group(function () {
+    Route::get('admin/payments', PaymentIndex::class)->name('admin.payments.index');
+    Route::get('admin/payments/{payment}', PaymentShow::class)->name('admin.payments.show');
+});
+
+Route::middleware(['auth', 'verified', 'permission:notifications.view'])->group(function () {
+    Route::get('admin/notifications', NotificationIndex::class)->name('admin.notifications.index');
+});
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('buyer-portal/profile', BuyerPortalProfile::class)->name('buyer-portal.profile');
 });
@@ -194,6 +210,8 @@ Route::middleware(['auth', 'verified', 'permission:orders.create|orders.view.own
     Route::get('buyer-portal/checkout', BuyerCheckoutPage::class)->name('buyer-portal.checkout');
     Route::get('buyer-portal/orders', BuyerOrderIndex::class)->name('buyer-portal.orders.index');
     Route::get('buyer-portal/orders/{order}', BuyerOrderShow::class)->name('buyer-portal.orders.show');
+    Route::get('buyer-portal/payments', BuyerPaymentIndex::class)->name('buyer-portal.payments.index');
+    Route::get('buyer-portal/receipts/{receipt}', BuyerReceiptShow::class)->name('buyer-portal.receipts.show');
 });
 
 Route::middleware(['auth', 'verified', 'permission:orders.create|orders.view.own'])->group(function () {

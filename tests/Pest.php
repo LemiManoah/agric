@@ -1,13 +1,22 @@
 <?php
 
+use App\Enums\ListingStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\RegistrationSource;
+use App\Enums\SupplyFrequency;
 use App\Enums\VerificationStatus;
+use App\Models\Buyer;
 use App\Models\District;
 use App\Models\Farmer;
 use App\Models\FarmerLocation;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Parish;
+use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Region;
 use App\Models\Subcounty;
+use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Village;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -120,4 +129,54 @@ function createFarmerRecord(array $farmerAttributes = [], array $locationAttribu
     ], $locationAttributes));
 
     return $farmer->fresh(['location.region', 'location.district', 'location.subcounty', 'location.parish', 'location.village']);
+}
+
+function createPaymentOrderContext(): array
+{
+    $location = createTestLocationHierarchy();
+    $buyerUser = User::factory()->create();
+    $buyerUser->assignRole('buyer');
+    $buyer = Buyer::factory()->create([
+        'user_id' => $buyerUser->id,
+        'email' => 'buyer.'.fake()->unique()->numberBetween(100, 999).'@example.test',
+        'phone' => fake()->unique()->numerify('25670#######'),
+    ]);
+
+    $supplier = Supplier::factory()->create([
+        'operating_district_id' => $location['district']->id,
+        'supply_frequency' => SupplyFrequency::Weekly,
+        'verification_status' => VerificationStatus::Verified,
+    ]);
+
+    $product = Product::factory()->create([
+        'product_category_id' => ProductCategory::factory(),
+        'linked_supplier_id' => $supplier->id,
+        'listing_status' => ListingStatus::Active,
+        'stock_available' => 200,
+        'minimum_order_quantity' => 10,
+        'price_per_unit_usd' => 5,
+    ]);
+
+    $order = Order::factory()->create([
+        'buyer_id' => $buyer->id,
+        'subtotal' => 100,
+        'discount_applied' => 0,
+        'order_total' => 100,
+        'payment_status' => PaymentStatus::Unpaid,
+    ]);
+
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'product_id' => $product->id,
+        'supplier_id' => $supplier->id,
+        'product_name_snapshot' => $product->name,
+        'quantity' => 20,
+        'unit_price_usd' => 5,
+        'line_total_usd' => 100,
+    ]);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    return compact('admin', 'buyer', 'buyerUser', 'order', 'product', 'supplier');
 }

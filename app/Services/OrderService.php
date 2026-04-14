@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationChannel;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
@@ -21,6 +22,7 @@ class OrderService
 {
     public function __construct(
         private CartService $cartService,
+        private NotificationService $notificationService,
         private OrderNumberGenerator $orderNumberGenerator,
         private StockService $stockService,
     ) {}
@@ -84,6 +86,7 @@ class OrderService
             ])->save();
 
             $this->writeStatusHistory($order, $oldStatus, $targetStatus, $actor, $notes);
+            $this->queueStatusNotifications($order, $targetStatus);
             $this->logEvent('order.status_changed', $order, $actor, ['from' => $oldStatus->value, 'to' => $targetStatus->value, 'notes' => $notes]);
 
             return $order->fresh($this->relations());
@@ -198,6 +201,7 @@ class OrderService
 
             $this->writeStatusHistory($order, null, OrderStatus::Pending, $actor, 'Order created at checkout.');
             $this->cartService->clearCart($cart, $actor);
+            $this->queueStatusNotifications($order, OrderStatus::Pending);
 
             if ($agent) {
                 $agent->increment('total_orders_placed');
@@ -300,6 +304,41 @@ class OrderService
             ->log($event);
     }
 
+    private function queueStatusNotifications(Order $order, OrderStatus $status): void
+    {
+        $buyer = $order->buyer;
+
+        if (! $buyer) {
+            return;
+        }
+
+        $templateKey = match ($status) {
+            OrderStatus::Pending => 'order_placed',
+            OrderStatus::Confirmed => 'order_confirmed',
+            OrderStatus::Dispatched => 'order_dispatched',
+            default => null,
+        };
+
+        if ($templateKey === null) {
+            return;
+        }
+
+        $payload = [
+            'order_number' => $order->order_number,
+            'amount' => number_format((float) $order->order_total, 2),
+            'buyer_name' => $buyer->contact_person_full_name,
+            'status' => $status->value,
+        ];
+
+        if ($buyer->email) {
+            $this->notificationService->queueTemplate($templateKey, NotificationChannel::Email->value, $buyer->email, $payload, $buyer);
+        }
+
+        if ($buyer->phone) {
+            $this->notificationService->queueTemplate($templateKey, NotificationChannel::Sms->value, $buyer->phone, $payload, $buyer);
+        }
+    }
+
     /**
      * @return array<int, string>
      */
@@ -311,6 +350,8 @@ class OrderService
             'creator',
             'items.product.images',
             'items.supplier',
+            'payments',
+            'receipts',
             'statusHistories.changedBy',
         ];
     }

@@ -115,6 +115,22 @@
                     </x-layouts.sidebar-two-level-link-parent>
                 @endcan
 
+                @if ((auth()->user()?->hasRole('super_admin') || auth()->user()?->isRegionalAdmin()) && auth()->user()?->can('payments.view'))
+                    <x-layouts.sidebar-two-level-link-parent title="Payments" icon="fas-money-check-dollar" :active="request()->routeIs('admin.payments.*') || request()->routeIs('buyer-portal.payments.*') || request()->routeIs('buyer-portal.receipts.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.payments.index') }}" icon="fas-list" :active="request()->routeIs('admin.payments.*')">
+                            Payment list
+                        </x-layouts.sidebar-two-level-link>
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endif
+
+                @if (auth()->user()?->can('notifications.view'))
+                    <x-layouts.sidebar-two-level-link-parent title="Notifications" icon="fas-envelope" :active="request()->routeIs('admin.notifications.*')">
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.notifications.index') }}" icon="fas-list" :active="request()->routeIs('admin.notifications.*')">
+                            Notification log
+                        </x-layouts.sidebar-two-level-link>
+                    </x-layouts.sidebar-two-level-link-parent>
+                @endif
+
                 @if (auth()->user()?->hasRole('buyer'))
                     <x-layouts.sidebar-two-level-link-parent title="Buyer Portal" icon="fas-store" :active="request()->routeIs('buyer-portal.*')">
                         <x-layouts.sidebar-two-level-link href="{{ route('buyer-portal.profile') }}" icon="fas-user" :active="request()->routeIs('buyer-portal.profile')">
@@ -125,6 +141,9 @@
                         </x-layouts.sidebar-two-level-link>
                         <x-layouts.sidebar-two-level-link href="{{ route('buyer-portal.orders.index') }}" icon="fas-receipt" :active="request()->routeIs('buyer-portal.orders.*')">
                             My orders
+                        </x-layouts.sidebar-two-level-link>
+                        <x-layouts.sidebar-two-level-link href="{{ route('buyer-portal.payments.index') }}" icon="fas-wallet" :active="request()->routeIs('buyer-portal.payments.*') || request()->routeIs('buyer-portal.receipts.*')">
+                            My payments
                         </x-layouts.sidebar-two-level-link>
                     </x-layouts.sidebar-two-level-link-parent>
                 @endif
@@ -152,6 +171,10 @@
 
                         <x-layouts.sidebar-two-level-link href="{{ route('admin.reports.product-catalogue-summary') }}" icon="fas-box-open" :active="request()->routeIs('admin.reports.product-catalogue-summary')">
                             Product summary
+                        </x-layouts.sidebar-two-level-link>
+
+                        <x-layouts.sidebar-two-level-link href="{{ route('admin.reports.payment-summary') }}" icon="fas-file-invoice-dollar" :active="request()->routeIs('admin.reports.payment-summary')">
+                            Payment summary
                         </x-layouts.sidebar-two-level-link>
                     </x-layouts.sidebar-two-level-link-parent>
                 @endif

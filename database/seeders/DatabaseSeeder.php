@@ -14,11 +14,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             UgandaLocationSeeder::class,
+            NotificationTemplateSeeder::class,
             DemoUserSeeder::class,
             M1DemoDataSeeder::class,
             BuyerDemoSeeder::class,
             ProductCatalogueDemoSeeder::class,
             OrderDemoSeeder::class,
+            PaymentAndReceiptDemoSeeder::class,
         ]);
     }
 }

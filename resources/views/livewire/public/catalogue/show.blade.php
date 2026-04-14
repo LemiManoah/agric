@@ -57,12 +57,12 @@
                         </div>
                     @else
                         <p class="mt-2 text-sm leading-7 text-emerald-700 dark:text-emerald-300">
-                            Sign in with a buyer or agent account to add this listing to a cart.
+                            Sign in to buy with a buyer or agent account and add this listing to a cart.
                         </p>
                     @endif
                 @else
                     <p class="mt-2 text-sm leading-7 text-emerald-700 dark:text-emerald-300">
-                        Sign in with a buyer or agent account to add this listing to a cart.
+                        Sign in to buy with a buyer or agent account and add this listing to a cart.
                     </p>
                 @endauth
             </div>

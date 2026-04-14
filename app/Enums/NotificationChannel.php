@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Enums;
+
+enum NotificationChannel: string
+{
+    case Sms = 'sms';
+    case Whatsapp = 'whatsapp';
+    case Email = 'email';
+}

@@ -3,24 +3,34 @@
 namespace App\Livewire\FarmerPortal\Registration;
 
 use App\Enums\InternetAccessLevel;
+use App\Enums\IrrigationAvailability;
+use App\Enums\MarketDestination;
+use App\Enums\ProductionScale;
 use App\Enums\RegistrationSource;
 use App\Models\District;
 use App\Models\Farmer;
 use App\Models\Parish;
 use App\Models\Region;
 use App\Models\Subcounty;
+use App\Models\ValueChain;
 use App\Models\Village;
+use App\Services\FarmerPhotoService;
 use App\Services\FarmerRegistrationService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 #[Title('Farmer Registration Wizard')]
 class Wizard extends Component
 {
+    use WithFileUploads;
+
     protected FarmerRegistrationService $registrationService;
+
+    protected FarmerPhotoService $photoService;
 
     public bool $managedRegistration = false;
 
@@ -72,9 +82,34 @@ class Wizard extends Component
 
     public string $farm_boundary_geojson = '';
 
-    public function boot(FarmerRegistrationService $registrationService): void
+    public mixed $passport_photo = null;
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $business_profile = [
+        'farm_name' => '',
+        'ursb_registration_number' => '',
+        'farm_size_acres' => '',
+        'number_of_plots' => '',
+        'irrigation_availability' => '',
+        'post_harvest_storage_capacity_tonnes' => '',
+        'has_warehouse_access' => false,
+        'cooperative_member' => false,
+        'cooperative_name' => '',
+        'cooperative_role' => '',
+        'average_annual_income_bracket' => '',
+    ];
+
+    /**
+     * @var array<int, array<string, mixed>>
+     */
+    public array $value_chains = [];
+
+    public function boot(FarmerRegistrationService $registrationService, FarmerPhotoService $photoService): void
     {
         $this->registrationService = $registrationService;
+        $this->photoService = $photoService;
     }
 
     public function mount(): void
@@ -91,6 +126,10 @@ class Wizard extends Component
 
         if ($user?->district_id) {
             $this->district_id = (int) $user->district_id;
+        }
+
+        if ($this->value_chains === []) {
+            $this->value_chains[] = $this->emptyValueChainRow();
         }
     }
 
@@ -126,7 +165,7 @@ class Wizard extends Component
     {
         $this->validate($this->rulesForStep($this->step));
 
-        if ($this->step < 4) {
+        if ($this->step < $this->totalSteps()) {
             $this->step++;
         }
     }
@@ -142,7 +181,12 @@ class Wizard extends Component
     {
         $this->validate($this->allRules());
 
-        $this->registrationService->createFarmer($this->payload(), auth()->user());
+        $this->registrationService->createFarmer(
+            array_merge($this->payload(), [
+                'passport_photo_path' => $this->photoService->replacePhoto($this->passport_photo),
+            ]),
+            auth()->user(),
+        );
 
         session()->flash('status', 'Farmer registration submitted successfully.');
 
@@ -158,9 +202,13 @@ class Wizard extends Component
         return view('livewire.farmer-portal.registration.wizard', [
             'districts' => $this->districts(),
             'internetAccessLevels' => InternetAccessLevel::cases(),
+            'irrigationAvailabilityOptions' => IrrigationAvailability::cases(),
+            'marketDestinationOptions' => MarketDestination::cases(),
             'parishes' => $this->parishes(),
+            'productionScaleOptions' => ProductionScale::cases(),
             'regions' => $this->regions(),
             'subcounties' => $this->subcounties(),
+            'valueChainOptions' => ValueChain::query()->where('is_active', true)->orderBy('name')->get(),
             'villages' => $this->villages(),
         ])->layout(auth()->check() ? 'components.layouts.app' : 'components.layouts.auth');
     }
@@ -199,6 +247,28 @@ class Wizard extends Component
                 'internet_access_level' => ['nullable', Rule::in(array_column(InternetAccessLevel::cases(), 'value'))],
                 'farm_boundary_geojson' => ['nullable', 'string'],
             ],
+            4 => [
+                'passport_photo' => ['nullable', 'image', 'max:2048'],
+                'business_profile.farm_name' => ['nullable', 'string', 'max:255'],
+                'business_profile.ursb_registration_number' => ['nullable', 'string', 'max:255'],
+                'business_profile.farm_size_acres' => ['nullable', 'numeric', 'min:0'],
+                'business_profile.number_of_plots' => ['nullable', 'integer', 'min:0'],
+                'business_profile.irrigation_availability' => ['nullable', Rule::in(array_column(IrrigationAvailability::cases(), 'value'))],
+                'business_profile.post_harvest_storage_capacity_tonnes' => ['nullable', 'numeric', 'min:0'],
+                'business_profile.has_warehouse_access' => ['nullable', 'boolean'],
+                'business_profile.cooperative_member' => ['nullable', 'boolean'],
+                'business_profile.cooperative_name' => ['nullable', 'string', 'max:255'],
+                'business_profile.cooperative_role' => ['nullable', 'string', 'max:255'],
+                'business_profile.average_annual_income_bracket' => ['nullable', 'string', 'max:255'],
+            ],
+            5 => [
+                'value_chains' => ['array'],
+                'value_chains.*.value_chain_id' => ['nullable', 'distinct', 'exists:value_chains,id'],
+                'value_chains.*.production_scale' => ['nullable', Rule::in(array_column(ProductionScale::cases(), 'value'))],
+                'value_chains.*.estimated_seasonal_harvest_kg' => ['nullable', 'numeric', 'min:0'],
+                'value_chains.*.current_market_destination' => ['nullable', Rule::in(array_column(MarketDestination::cases(), 'value'))],
+                'value_chains.*.input_access_details' => ['nullable', 'string'],
+            ],
             default => [],
         };
     }
@@ -209,6 +279,8 @@ class Wizard extends Component
             $this->rulesForStep(1),
             $this->rulesForStep(2),
             $this->rulesForStep(3),
+            $this->rulesForStep(4),
+            $this->rulesForStep(5),
         );
     }
 
@@ -237,7 +309,25 @@ class Wizard extends Component
             'distance_to_tarmac_road_km' => $this->distance_to_tarmac_road_km,
             'internet_access_level' => $this->internet_access_level,
             'farm_boundary_geojson' => $this->farm_boundary_geojson,
+            'business_profile' => $this->business_profile,
+            'value_chains' => $this->value_chains,
         ];
+    }
+
+    public function addValueChain(): void
+    {
+        $this->value_chains[] = $this->emptyValueChainRow();
+    }
+
+    public function removeValueChain(int $index): void
+    {
+        unset($this->value_chains[$index]);
+
+        $this->value_chains = array_values($this->value_chains);
+
+        if ($this->value_chains === []) {
+            $this->value_chains[] = $this->emptyValueChainRow();
+        }
     }
 
     private function regions(): Collection
@@ -275,5 +365,24 @@ class Wizard extends Component
             ->when($this->parish_id, fn ($query) => $query->where('parish_id', $this->parish_id))
             ->orderBy('name')
             ->get();
+    }
+
+    private function totalSteps(): int
+    {
+        return 6;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function emptyValueChainRow(): array
+    {
+        return [
+            'value_chain_id' => '',
+            'production_scale' => '',
+            'estimated_seasonal_harvest_kg' => '',
+            'current_market_destination' => '',
+            'input_access_details' => '',
+        ];
     }
 }

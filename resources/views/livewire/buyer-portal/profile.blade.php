@@ -11,15 +11,33 @@
     <form wire:submit="save" class="space-y-6">
         <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                <x-forms.input label="Company name" name="company_name" wire:model.live="company_name" />
-                <x-forms.input label="Country" name="country" wire:model.live="country" />
-                <x-forms.input label="Business type" name="business_type" wire:model.live="business_type" />
-                <x-forms.input label="Registration number" name="company_registration_number" wire:model.live="company_registration_number" />
-                <x-forms.input label="Contact person" name="contact_person_full_name" wire:model.live="contact_person_full_name" />
-                <x-forms.input label="Phone" name="phone" wire:model.live="phone" />
-                <x-forms.input label="Email" name="email" type="email" wire:model.live="email" />
-                <x-forms.input label="Annual import volume (USD range)" name="annual_import_volume_usd_range" wire:model.live="annual_import_volume_usd_range" />
-                <x-forms.input label="Preferred payment method" name="preferred_payment_method" wire:model.live="preferred_payment_method" />
+                <div class="space-y-1">
+                    <x-forms.input label="Company name" name="company_name" wire:model.live="company_name" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Country" name="country" wire:model.live="country" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Business type" name="business_type" wire:model.live="business_type" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Registration number" name="company_registration_number" wire:model.live="company_registration_number" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Contact person" name="contact_person_full_name" wire:model.live="contact_person_full_name" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Phone" name="phone" wire:model.live="phone" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Email" name="email" type="email" wire:model.live="email" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Annual import volume (USD range)" name="annual_import_volume_usd_range" wire:model.live="annual_import_volume_usd_range" />
+                </div>
+                <div class="space-y-1">
+                    <x-forms.input label="Preferred payment method" name="preferred_payment_method" wire:model.live="preferred_payment_method" />
+                </div>
             </div>
 
             <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm dark:border-gray-800 dark:bg-gray-900">
